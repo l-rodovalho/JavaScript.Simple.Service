@@ -1,0 +1,10 @@
+{
+    "name": "api-javascript",
+    "type": "module",
+    "scripts": {
+        "start": "node --env-file=.env main.js"
+    },
+    "dependencies": {
+        "pg": "^8.11.3"
+    }
+}
