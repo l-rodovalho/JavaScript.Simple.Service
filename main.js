@@ -1,18 +1,8 @@
 import * as http from 'node:http';
 import { env } from './infra/config/configuration.js';
-import { HealthController } from './infra/http/controllers/health.controller.js';
+import { routes } from './infra/http/routes.js';
 
 const PORT = env.PORT;
-
-const healthController = new HealthController();
-
-const routes = {
-    'GET:/health': (req, res) => healthController.getHealth(req, res),
-    default: (req, res) => {
-        res.writeHead(404, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: 'Route not found' }));
-    }
-};
 
 const server = http.createServer(async (req, res) => {
     const method = req.method || 'GET';
