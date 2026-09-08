@@ -21,5 +21,23 @@ function validator(variable, type, value) {
 export const env = {
     get PORT() {
         return validator('PORT', 'number', process.env.PORT);
+    },
+    get DB_HOST() {
+        return validator('DB_HOST', 'string', process.env.DB_HOST);
+    },
+    get DB_PORT() {
+        return validator('DB_PORT', 'number', process.env.DB_PORT);
+    },
+    get DB_USER() {
+        return validator('DB_USER', 'string', process.env.DB_USER);
+    },
+    get DB_PASSWORD() {
+        return validator('DB_PASSWORD', 'string', process.env.DB_PASSWORD);
+    },
+    get DB_NAME() {
+        return validator('DB_NAME', 'string', process.env.DB_NAME);
+    },
+    get DB_POOL_MAX() {
+        return validator('DB_POOL_MAX', 'number', process.env.DB_POOL_MAX);
     }
 };

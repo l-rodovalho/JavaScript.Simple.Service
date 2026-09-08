@@ -6,14 +6,17 @@ const PORT = env.PORT;
 
 const server = http.createServer(async (req, res) => {
     const method = req.method || 'GET';
-
     const url = (req.url || '/').split('?')[0];
 
-    const routeKey = `${method}:${url}`;
+    const segments = url.split('/').filter(Boolean);
+    const basePath = segments.length > 0 ? `/${segments[0]}` : '/';
+    const paramId = segments.length > 1 ? segments[1] : null;
+
+    const routeKey = `${method}:${basePath}`;
 
     const handler = routes[routeKey] ?? routes['default'];
 
-    return handler(req, res);
+    return handler(req, res, paramId);
 });
 
 const startServer = async () => {
