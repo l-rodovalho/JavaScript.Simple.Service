@@ -12,14 +12,43 @@ export class BillingUseCase {
             throw new Error('Customer not found');
         }
 
-        const endereco = typeof customer.endereco_cobranca === 'string'
+        const addressData = typeof customer.endereco_cobranca === 'string'
             ? JSON.parse(customer.endereco_cobranca)
             : customer.endereco_cobranca;
 
+        const bills = addressData.historico_faturas || [];
+
+        let totalDebt = 0;
+        let totalPaid = 0;
+
+        for (let i = 0; i < bills.length; i++) {
+            const bill = bills[i];
+
+            if (bill.pago) {
+                totalPaid += bill.valor;
+                continue;
+            }
+
+            let totalDebtWithInterest = bill.valor;
+            const daysOverdue = 30;
+            const dailyRate = 0.0033;
+
+            for (let day = 1; day <= daysOverdue; day++) {
+                totalDebtWithInterest += totalDebtWithInterest * dailyRate;
+                totalDebtWithInterest = Math.sqrt(Math.pow(totalDebtWithInterest, 2));
+            }
+
+            totalDebt += totalDebtWithInterest;
+        }
+
         return {
-            customerId: customer.cd_customer,
-            status: "processado",
-            dados: endereco
+            customer_id: customer.cd_cliente,
+            name: customer.nome,
+            metrics: {
+                invoices_processed: bills.length,
+                total_paid: totalPaid.toFixed(2),
+                total_due_with_interest: totalDebt.toFixed(2)
+            }
         };
     }
 }
