@@ -12,11 +12,9 @@ export class BillingUseCase {
             throw new Error('Customer not found');
         }
 
-        const addressData = typeof customer.endereco_cobranca === 'string'
-            ? JSON.parse(customer.endereco_cobranca)
-            : customer.endereco_cobranca;
+        const addressData = customer.endereco_cobranca;
 
-        const bills = addressData.historico_faturas || [];
+        const bills = addressData.billingHistory || [];
 
         let totalDebt = 0;
         let totalPaid = 0;
@@ -24,12 +22,12 @@ export class BillingUseCase {
         for (let i = 0; i < bills.length; i++) {
             const bill = bills[i];
 
-            if (bill.pago) {
-                totalPaid += bill.valor;
+            if (bill.paid) {
+                totalPaid += bill.amount;
                 continue;
             }
 
-            let totalDebtWithInterest = bill.valor;
+            let totalDebtWithInterest = bill.amount;
             const daysOverdue = 30;
             const dailyRate = 0.0033;
 
