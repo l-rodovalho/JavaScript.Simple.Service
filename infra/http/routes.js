@@ -1,12 +1,12 @@
-import { HealthController } from "./controllers/health.controller.js";
-import { CustomerController } from "./controllers/customer.controller.js";
+import { HealthHttpController } from "./controllers/health.http.controller.js";
+import { CustomerHttpController } from "./controllers/customer.http.controller.js";
 
-const healthController = new HealthController();
-const customerController = new CustomerController()
+const healthHttpController = new HealthHttpController();
+const customerHttpController = new CustomerHttpController()
 
 export const routes = {
-    'GET:/health': (req, res) => healthController.getHealth(req, res),
-    'POST:/billing': (req, res, customerId) => customerController.processBilling(req, res, customerId),
+    'GET:/health': (req, res) => healthHttpController.getHealth(req, res),
+    'POST:/billing': (req, res, customerId) => customerHttpController.processBilling(req, res, customerId),
     default: (req, res) => {
         res.writeHead(404, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: 'Route not found' }));

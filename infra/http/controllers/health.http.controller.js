@@ -1,4 +1,4 @@
-export class HealthController {
+export class HealthHttpController {
     getHealth(req, res) {
         const response = { message: "OK" };
 
