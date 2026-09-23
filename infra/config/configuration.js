@@ -19,8 +19,11 @@ function validator(variable, type, value) {
 }
 
 export const env = {
-    get PORT() {
-        return validator('PORT', 'number', process.env.PORT);
+    get HTTP_PORT() {
+        return validator('HTTP_PORT', 'number', process.env.HTTP_PORT);
+    },
+    get GRPC_PORT() {
+        return validator('GRPC_PORT', 'number', process.env.GRPC_PORT);
     },
     get DB_HOST() {
         return validator('DB_HOST', 'string', process.env.DB_HOST);

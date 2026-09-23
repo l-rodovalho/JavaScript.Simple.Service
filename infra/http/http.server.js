@@ -3,7 +3,7 @@ import { env } from '../config/configuration.js';
 import { getHttpRoutes } from './routes.js';
 
 export const startHttpServer = (billingUseCase) => {
-    const PORT = env.PORT;
+    const HTTP_PORT = env.HTTP_PORT;
 
     const routes = getHttpRoutes(billingUseCase);
 
@@ -22,7 +22,7 @@ export const startHttpServer = (billingUseCase) => {
         return handler(req, res, paramId);
     });
 
-    server.listen(PORT, () => {
-        console.log(`HTTP server listening on port ${PORT}`);
+    server.listen(HTTP_PORT, () => {
+        console.log(`HTTP server listening on port ${HTTP_PORT}`);
     });
 };
