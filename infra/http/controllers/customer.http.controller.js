@@ -1,7 +1,5 @@
-import { BillingUseCase } from "../../../app/use-cases/billing.use-case.js";
-
 export class CustomerHttpController {
-    constructor(billingUseCase = new BillingUseCase()) {
+    constructor(billingUseCase) {
         this.billingUseCase = billingUseCase
     }
 
