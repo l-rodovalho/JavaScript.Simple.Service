@@ -8,13 +8,30 @@ export class CustomerGrpcController {
     async processBilling(call, callback) {
         try {
             const customerId = call.request.customer_id;
+
+            if (!customerId) {
+                return callback({
+                    code: grpc.status.INVALID_ARGUMENT,
+                    message: "Missing 'customer_id' in request"
+                });
+            }
+
             const result = await this.billingUseCase.execute(customerId);
 
             callback(null, result);
+
         } catch (error) {
-            callback({
-                code: error.message === 'Customer not found' ? grpc.status.NOT_FOUND : grpc.status.INTERNAL,
-                message: error.message
+            if (error.message === 'Customer not found') {
+                return callback({
+                    code: grpc.status.NOT_FOUND,
+                    message: error.message
+                });
+            }
+
+            console.error('gRPC CustomerController Error:', error);
+            return callback({
+                code: grpc.status.INTERNAL,
+                message: "Internal server error"
             });
         }
     }
