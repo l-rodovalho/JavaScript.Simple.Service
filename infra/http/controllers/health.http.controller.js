@@ -1,8 +1,8 @@
 export class HealthHttpController {
-    getHealth(req, res) {
+    getHealth(request, reply) {
         const response = { message: "OK" };
 
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify(response));
+        return reply.status(200).send(response);
     }
 }
+

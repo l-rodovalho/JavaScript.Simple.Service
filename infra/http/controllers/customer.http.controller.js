@@ -1,17 +1,23 @@
 export class CustomerHttpController {
     constructor(billingUseCase) {
-        this.billingUseCase = billingUseCase
+        this.billingUseCase = billingUseCase;
     }
 
-    async processBilling(req, res, paramId) {
+    async processBilling(request, reply) {
         try {
-            const response = await this.billingUseCase.execute(paramId);
+            const customerId = request.params?.customerId;
 
-            res.writeHead(200, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify(response));
+            if (!customerId) {
+                return reply.status(400).send({ error: "Missing 'customerId' in params" });
+            }
+
+            const response = await this.billingUseCase.execute(customerId);
+
+            return reply.status(200).send(response);
+
         } catch (error) {
-            res.writeHead(500, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ error: error.message }));
+            request.log.error(error);
+            return reply.status(500).send({ error: "Internal server error" });
         }
     }
 }

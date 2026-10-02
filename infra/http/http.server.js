@@ -1,28 +1,22 @@
-import * as http from 'node:http';
+import Fastify from 'fastify';
 import { env } from '../config/configuration.js';
-import { getHttpRoutes } from './routes.js';
+import { registerRoutes } from './routes.js';
 
-export const startHttpServer = (billingUseCase) => {
+export const startHttpServer = async (billingUseCase) => {
     const HTTP_PORT = env.HTTP_PORT;
 
-    const routes = getHttpRoutes(billingUseCase);
-
-    const server = http.createServer(async (req, res) => {
-        const method = req.method || 'GET';
-        const url = (req.url || '/').split('?')[0];
-
-        const segments = url.split('/').filter(Boolean);
-        const basePath = segments.length > 0 ? `/${segments[0]}` : '/';
-        const paramId = segments.length > 1 ? segments[1] : null;
-
-        const routeKey = `${method}:${basePath}`;
-
-        const handler = routes[routeKey] ?? routes['default'];
-
-        return handler(req, res, paramId);
+    const server = Fastify({
+        logger: { level: 'error' }
     });
 
-    server.listen(HTTP_PORT, () => {
+    await server.register(registerRoutes, { billingUseCase });
+
+    try {
+        await server.listen({ port: HTTP_PORT, host: '0.0.0.0' });
         console.log(`HTTP server listening on port ${HTTP_PORT}`);
-    });
+    } catch (error) {
+        server.log.error(error);
+        process.exit(1);
+    }
 };
+
