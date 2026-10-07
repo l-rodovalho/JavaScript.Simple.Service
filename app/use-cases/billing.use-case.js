@@ -33,7 +33,7 @@ export class BillingUseCase {
 
             for (let day = 1; day <= daysOverdue; day++) {
                 totalDebtWithInterest += totalDebtWithInterest * dailyRate;
-                totalDebtWithInterest = Math.sqrt(Math.pow(totalDebtWithInterest, 2));
+                totalDebtWithInterest = Math.abs(totalDebtWithInterest);
             }
 
             totalDebt += totalDebtWithInterest;
