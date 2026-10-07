@@ -27,16 +27,12 @@ export class BillingUseCase {
                 continue;
             }
 
-            let totalDebtWithInterest = bill.amount;
             const daysOverdue = 30;
             const dailyRate = 0.0033;
 
-            for (let day = 1; day <= daysOverdue; day++) {
-                totalDebtWithInterest += totalDebtWithInterest * dailyRate;
-                totalDebtWithInterest = Math.abs(totalDebtWithInterest);
-            }
+            const totalDebtWithInterest = bill.amount * ((1 + dailyRate) ** daysOverdue);
 
-            totalDebt += totalDebtWithInterest;
+            totalDebt += Math.abs(totalDebtWithInterest);
         }
 
         return {
