@@ -42,5 +42,8 @@ export const env = {
     },
     get DB_POOL_MAX() {
         return validator('DB_POOL_MAX', 'number', process.env.DB_POOL_MAX);
+    },
+    get PROTOCOL() {
+        return validator('POTOCOL', 'string', process.env.PROTOCOL);
     }
 };
