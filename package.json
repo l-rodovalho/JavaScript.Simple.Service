@@ -2,7 +2,8 @@
     "name": "api-javascript",
     "type": "module",
     "scripts": {
-        "start": "node --env-file=.env main.js"
+        "start": "node --env-file=.env main.js",
+        "seed": "node --env-file=.env infra/database/seed.js"
     },
     "dependencies": {
         "@grpc/grpc-js": "^1.14.5",

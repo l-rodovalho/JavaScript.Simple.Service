@@ -1,5 +1,14 @@
 import { dbPool } from './database.config.js';
 
+let seed = 123456789;
+
+function seededRandom() {
+    let t = (seed += 0x6D2B79F5);
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+}
+
 const TOTAL_RECORDS = 100000;
 const BATCH_SIZE = 5000;
 
@@ -14,11 +23,11 @@ async function executeSeed() {
         for (let j = 0; j < BATCH_SIZE; j++) {
             const globalIndex = i + j;
 
-            const billsCount = Math.floor(Math.random() * 6) + 1;
+            const billsCount = Math.floor(seededRandom() * 6) + 1;
             const bills = Array.from({ length: billsCount }, (_, idx) => ({
                 month: `2026-0${idx + 1}`,
-                amount: Number((Math.random() * 5000 + 100).toFixed(2)),
-                paid: Math.random() > 0.5
+                amount: Number((seededRandom() * 5000 + 100).toFixed(2)),
+                paid: seededRandom() > 0.5
             }));
 
             const zipPrefix = String(10000 + (globalIndex % 89999));
@@ -39,7 +48,7 @@ async function executeSeed() {
                 `cliente_${globalIndex}@email.com`,
                 `${globalIndex.toString().padStart(11, '0')}`,
                 'ENTERPRISE',
-                Number((Math.random() * 1000 * 3.14).toFixed(2)),
+                Number((seededRandom() * 1000 * 3.14).toFixed(2)),
                 billingAddress,
                 true
             );
