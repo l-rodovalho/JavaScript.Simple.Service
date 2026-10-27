@@ -7,9 +7,10 @@ export const pool = new Pool({
     user: env.DB_USER,
     password: env.DB_PASSWORD,
     database: env.DB_NAME,
-    max: 10,
+    max: env.DB_POOL_MAX,
     connectionTimeoutMillis: 5000,
     idleTimeoutMillis: 30000,
+    query_timeout: 30000,
 });
 
 export const dbPool = pool;
