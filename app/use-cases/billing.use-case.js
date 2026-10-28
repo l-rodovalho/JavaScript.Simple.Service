@@ -1,20 +1,24 @@
-import { CustomerRepository } from "../../infra/database/repositories/customer.repository.js";
+import { CustomerNotFoundError, InvalidCustomerIdError } from '../errors.js';
+
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export class BillingUseCase {
-    constructor(customerRepository = new CustomerRepository()) {
+    constructor(customerRepository) {
         this.customerRepository = customerRepository;
     }
 
     async execute(customerId) {
+        if (typeof customerId !== 'string' || !UUID_PATTERN.test(customerId)) {
+            throw new InvalidCustomerIdError();
+        }
+
         const customer = await this.customerRepository.findById(customerId);
 
         if (!customer) {
-            throw new Error('Customer not found');
+            throw new CustomerNotFoundError();
         }
 
-        const addressData = customer.endereco_cobranca;
-
-        const bills = addressData.billingHistory || [];
+        const bills = customer.bills;
 
         let totalDebt = 0;
         let totalPaid = 0;
@@ -36,8 +40,8 @@ export class BillingUseCase {
         }
 
         return {
-            customer_id: customer.cd_cliente,
-            name: customer.nome,
+            customer_id: customer.customerId,
+            name: customer.name,
             metrics: {
                 invoices_processed: bills.length,
                 total_paid: totalPaid.toFixed(2),

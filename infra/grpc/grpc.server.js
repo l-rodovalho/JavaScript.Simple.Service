@@ -3,6 +3,7 @@ import * as protoLoader from '@grpc/proto-loader';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { CustomerGrpcController } from './controllers/customer.grpc.controller.js';
+import { InvoiceGrpcController } from './controllers/invoice.grpc.controller.js';
 import { HealthGrpcController } from './controllers/health.grpc.controller.js';
 import { env } from '../config/configuration.js';
 
@@ -14,11 +15,12 @@ const PROTO_PATHS = [
     path.join(__dirname, 'proto', 'health.proto')
 ];
 
-const GRPC_PORT = env.GRPC_PORT;
+export const startGrpcServer = ({ billingUseCase, calculateInvoicesUseCase }) => {
+    const GRPC_PORT = env.GRPC_PORT;
 
-export const startGrpcServer = (billingUseCase) => {
     return new Promise((resolve, reject) => {
         const customerGrpcController = new CustomerGrpcController(billingUseCase);
+        const invoiceGrpcController = new InvoiceGrpcController(calculateInvoicesUseCase);
         const healthGrpcController = new HealthGrpcController();
 
         const packageDefinition = protoLoader.loadSync(PROTO_PATHS, {
@@ -26,10 +28,14 @@ export const startGrpcServer = (billingUseCase) => {
         });
 
         const grpcObject = grpc.loadPackageDefinition(packageDefinition);
-        const server = new grpc.Server();
+        const server = new grpc.Server({
+            'grpc.max_receive_message_length': 16777216,
+            'grpc.max_send_message_length': 16777216
+        });
 
         server.addService(grpcObject.billing.BillingService.service, {
-            ProcessBilling: (call, callback) => customerGrpcController.processBilling(call, callback)
+            ProcessBilling: (call, callback) => customerGrpcController.processBilling(call, callback),
+            CalculateInvoices: (call, callback) => invoiceGrpcController.calculate(call, callback)
         });
 
         server.addService(grpcObject.health.HealthService.service, {

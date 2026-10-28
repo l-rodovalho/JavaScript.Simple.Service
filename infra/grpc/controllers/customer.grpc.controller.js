@@ -1,4 +1,5 @@
 import * as grpc from '@grpc/grpc-js';
+import { CustomerNotFoundError, InvalidCustomerIdError } from '../../../app/errors.js';
 
 export class CustomerGrpcController {
     constructor(billingUseCase) {
@@ -6,22 +7,19 @@ export class CustomerGrpcController {
     }
 
     async processBilling(call, callback) {
-        try {
-            const customerId = call.request.customer_id;
+        let result;
 
-            if (!customerId) {
+        try {
+            result = await this.billingUseCase.execute(call.request.customer_id);
+        } catch (error) {
+            if (error instanceof InvalidCustomerIdError) {
                 return callback({
                     code: grpc.status.INVALID_ARGUMENT,
-                    message: "Missing 'customer_id' in request"
+                    message: error.message
                 });
             }
 
-            const result = await this.billingUseCase.execute(customerId);
-
-            callback(null, result);
-
-        } catch (error) {
-            if (error.message === 'Customer not found') {
+            if (error instanceof CustomerNotFoundError) {
                 return callback({
                     code: grpc.status.NOT_FOUND,
                     message: error.message
@@ -34,5 +32,7 @@ export class CustomerGrpcController {
                 message: "Internal server error"
             });
         }
+
+        callback(null, result);
     }
 }
